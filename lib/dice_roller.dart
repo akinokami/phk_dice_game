@@ -36,6 +36,7 @@ class _DiceRollerState extends State<DiceRoller> {
 
   final player = AudioPlayer();
   final diceRollPlayer = AudioPlayer();
+  bool isMuted = false;
 
   @override
   void initState() {
@@ -48,12 +49,22 @@ class _DiceRollerState extends State<DiceRoller> {
   }
 
   void playRollSound() async {
-    player.play(AssetSource('dice_roll.mp3'));
+    diceRollPlayer.play(AssetSource('dice_roll.mp3'));
+  }
+
+  void muteUnmute() {
+    if (isMuted) {
+      player.setVolume(1.0); // Unmute the audio
+    } else {
+      player.setVolume(0.0); // Mute the audio
+    }
+    setState(() {
+      isMuted = !isMuted; // Toggle the mute state
+    });
+    print(isMuted);
   }
 
   void rollDice() {
-    resetData();
-    playRollSound();
     setState(() {
       dice1 = Random().nextInt(6) + 1;
       dice2 = Random().nextInt(6) + 1;
@@ -81,6 +92,7 @@ class _DiceRollerState extends State<DiceRoller> {
   }
 
   void resetData() {
+    playRollSound();
     setState(() {
       dice1 = 1;
       dice2 = 1;
@@ -175,7 +187,7 @@ class _DiceRollerState extends State<DiceRoller> {
                     exit(0);
                   },
                   child: Image.asset(
-                    'assets/play.webp',
+                    'assets/close.webp',
                     width: MediaQuery.of(context).size.width * 0.08,
                     height: MediaQuery.of(context).size.height * 0.08,
                   ),
@@ -185,9 +197,9 @@ class _DiceRollerState extends State<DiceRoller> {
                 top: 10,
                 right: 0,
                 child: InkWell(
-                  onTap: resetData,
+                  onTap: muteUnmute,
                   child: Image.asset(
-                    'assets/play.webp',
+                    isMuted ? 'assets/mute.webp' : 'assets/un_mute.webp',
                     width: MediaQuery.of(context).size.width * 0.08,
                     height: MediaQuery.of(context).size.height * 0.08,
                   ),
