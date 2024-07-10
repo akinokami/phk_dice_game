@@ -2,13 +2,14 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
-import 'package:dice_game/widget/dice_five.dart';
-import 'package:dice_game/widget/dice_four.dart';
-import 'package:dice_game/widget/dice_one.dart';
-import 'package:dice_game/widget/dice_six.dart';
-import 'package:dice_game/widget/dice_three.dart';
-import 'package:dice_game/widget/dice_two.dart';
-import 'package:dice_game/widget/rolling_dice.dart';
+import 'package:dice_game/models/dice_model.dart';
+import 'package:dice_game/widgets/dice_five.dart';
+import 'package:dice_game/widgets/dice_four.dart';
+import 'package:dice_game/widgets/dice_one.dart';
+import 'package:dice_game/widgets/dice_six.dart';
+import 'package:dice_game/widgets/dice_three.dart';
+import 'package:dice_game/widgets/dice_two.dart';
+import 'package:dice_game/widgets/rolling_dice.dart';
 import 'package:flutter/material.dart';
 
 class DiceRoller extends StatefulWidget {
@@ -19,7 +20,8 @@ class DiceRoller extends StatefulWidget {
   _DiceRollerState createState() => _DiceRollerState();
 }
 
-class _DiceRollerState extends State<DiceRoller> {
+class _DiceRollerState extends State<DiceRoller>
+    with SingleTickerProviderStateMixin {
   int dice1 = 1;
   int dice2 = 1;
   int dice3 = 1;
@@ -30,7 +32,7 @@ class _DiceRollerState extends State<DiceRoller> {
   Color? d4Color;
   Color? d5Color;
   Color? d6Color;
-  //x: 277.3046874999987 y: 55.330078125
+
   Offset _position = const Offset(277.3046874999987, 55.330078125);
   bool isCalculate = true;
 
@@ -38,9 +40,19 @@ class _DiceRollerState extends State<DiceRoller> {
   final diceRollPlayer = AudioPlayer();
   bool isMuted = false;
 
+  int total = 0;
+  late AnimationController animationController;
+  late Animation<double> animation;
+
   @override
   void initState() {
     playSound();
+    animationController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 100));
+    animation = Tween(begin: -0.01, end: 0.01).animate(
+      CurvedAnimation(parent: animationController, curve: Curves.slowMiddle),
+    );
+
     super.initState();
   }
 
@@ -69,6 +81,7 @@ class _DiceRollerState extends State<DiceRoller> {
       dice1 = Random().nextInt(6) + 1;
       dice2 = Random().nextInt(6) + 1;
       dice3 = Random().nextInt(6) + 1;
+      total = dice1 + dice2 + dice3;
       if (dice1 == 1 || dice2 == 1 || dice3 == 1) {
         d1Color = const Color.fromARGB(255, 190, 233, 192);
       }
@@ -92,6 +105,11 @@ class _DiceRollerState extends State<DiceRoller> {
   }
 
   void resetData() {
+    animationController.repeat(
+        reverse: true, period: const Duration(milliseconds: 100));
+    Future.delayed(const Duration(seconds: 1), () {
+      animationController.stop();
+    });
     playRollSound();
     setState(() {
       dice1 = 1;
@@ -103,6 +121,7 @@ class _DiceRollerState extends State<DiceRoller> {
       d4Color = Colors.white;
       d5Color = Colors.white;
       d6Color = Colors.white;
+      total = 0;
       _position = const Offset(277.3046874999987, 55.330078125);
       isCalculate = true;
     });
@@ -111,9 +130,6 @@ class _DiceRollerState extends State<DiceRoller> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text('Dice Roller Game'),
-      // ),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -124,8 +140,6 @@ class _DiceRollerState extends State<DiceRoller> {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Stack(
-            // mainAxisAlignment: MainAxisAlignment.end,
-            // crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Positioned(
                 top: MediaQuery.of(context).size.height * 0.2,
@@ -171,17 +185,35 @@ class _DiceRollerState extends State<DiceRoller> {
                     });
                     print('x: ${_position.dx} y: ${_position.dy}');
                   },
-                  child: Image.asset(
-                    'assets/pu1.webp',
-                    width: MediaQuery.of(context).size.width * 0.4,
-                    height: MediaQuery.of(context).size.height * 0.4,
+                  child: RotationTransition(
+                    turns: animation,
+                    child: Image.asset(
+                      'assets/pu1.webp',
+                      width: MediaQuery.of(context).size.width * 0.4,
+                      height: MediaQuery.of(context).size.height * 0.4,
+                    ),
                   ),
+
+                  // AnimatedBuilder(
+                  //   animation: animationController,
+                  //   builder: (_, child) => Transform(
+                  //     alignment: Alignment.center,
+                  //     transform: Matrix4.identity()
+                  //       ..setEntry(3, 2, 0.001)
+                  //       ..rotateY(
+                  //           360 * animationController.value * (pi / 180.0)),
+                  //     child: Image.asset(
+                  //       'assets/pu1.webp',
+                  //       width: MediaQuery.of(context).size.width * 0.4,
+                  //       height: MediaQuery.of(context).size.height * 0.4,
+                  //     ),
+                  //   ),
+                  // ),
                 ),
               ),
-
               Positioned(
                 top: 10,
-                left: 0,
+                left: 50,
                 child: InkWell(
                   onTap: () {
                     exit(0);
@@ -195,7 +227,7 @@ class _DiceRollerState extends State<DiceRoller> {
               ),
               Positioned(
                 top: 10,
-                right: 0,
+                right: 50,
                 child: InkWell(
                   onTap: muteUnmute,
                   child: Image.asset(
@@ -205,13 +237,12 @@ class _DiceRollerState extends State<DiceRoller> {
                   ),
                 ),
               ),
-              // InkWell(onTap: rollDice, child: Image.asset('assets/dice6.webp')),
               Positioned(
                 bottom: 0.0,
                 left: MediaQuery.of(context).size.width * 0.10,
                 right: MediaQuery.of(context).size.width * 0.10,
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     DiceOne(color: d1Color),
                     const SizedBox(width: 5.0),
@@ -236,6 +267,72 @@ class _DiceRollerState extends State<DiceRoller> {
                   ],
                 ),
               ),
+              Positioned(
+                left: 0.0,
+                top: 20,
+                child: SizedBox(
+                  width: 50,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: leftList.length,
+                    // scrollDirection: Axis.horizontal,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        width: 50,
+                        padding: const EdgeInsets.all(3.0),
+                        decoration: BoxDecoration(
+                          color: total == leftList[index].id
+                              ? const Color.fromARGB(255, 190, 233, 192)
+                              : Colors.white,
+                          border: Border.all(color: Colors.black, width: 1),
+                        ),
+                        child: Column(
+                          children: [
+                            Visibility(
+                              visible: leftList[index].id != 18,
+                              child: Text("${leftList[index].id ?? ''}"),
+                            ),
+                            Text(leftList[index].name ?? ''),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              Positioned(
+                right: 0.0,
+                top: 20,
+                child: SizedBox(
+                  width: 50,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: rightList.length,
+                    // scrollDirection: Axis.horizontal,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        width: 50,
+                        padding: const EdgeInsets.all(3.0),
+                        decoration: BoxDecoration(
+                          color: total == rightList[index].id
+                              ? const Color.fromARGB(255, 190, 233, 192)
+                              : Colors.white,
+                          border: Border.all(color: Colors.black, width: 1),
+                        ),
+                        child: Column(
+                          children: [
+                            Visibility(
+                              visible: rightList[index].id != 19,
+                              child: Text("${rightList[index].id ?? ''}"),
+                            ),
+                            Text(rightList[index].name ?? ''),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              )
             ],
           ),
         ),
