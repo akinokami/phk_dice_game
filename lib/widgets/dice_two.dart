@@ -8,14 +8,14 @@ class DiceTwo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 35.w,
-      height: 87.h,
+      width: 40.w,
+      height: 40.w,
       padding: EdgeInsets.all(2.sp),
       decoration: BoxDecoration(
           color: color ?? Colors.white,
           border: Border.all(color: Colors.black, width: 2),
           borderRadius: BorderRadius.all(Radius.circular(10.r))),
-      child: const Column(
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Align(
@@ -23,6 +23,7 @@ class DiceTwo extends StatelessWidget {
             child: Icon(
               Icons.circle,
               color: Colors.black,
+              size: 10.sp,
             ),
           ),
           Align(
@@ -30,6 +31,7 @@ class DiceTwo extends StatelessWidget {
             child: Icon(
               Icons.circle,
               color: Colors.black,
+              size: 10.sp,
             ),
           ),
         ],

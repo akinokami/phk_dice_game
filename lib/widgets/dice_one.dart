@@ -8,16 +8,17 @@ class DiceOne extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 35.w,
-      height: 87.h,
+      width: 40.w,
+      height: 40.w,
       decoration: BoxDecoration(
           color: color ?? Colors.white,
           border: Border.all(color: Colors.black, width: 2),
           borderRadius: BorderRadius.all(Radius.circular(10.r))),
-      child: const Center(
+      child: Center(
         child: Icon(
           Icons.circle,
           color: Colors.red,
+          size: 10.sp,
         ),
       ),
     );

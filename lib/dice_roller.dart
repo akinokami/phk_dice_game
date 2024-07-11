@@ -36,7 +36,8 @@ class _DiceRollerState extends State<DiceRoller>
   Color? d5Color;
   Color? d6Color;
 
-  Offset _position = const Offset(0.0, 0.0);
+  late Offset
+      _position; //= Offset(Global.screenWidth / 3.5, Global.screenHeight / 6);
 
   bool isCalculate = true;
 
@@ -52,36 +53,15 @@ class _DiceRollerState extends State<DiceRoller>
 
   @override
   void initState() {
-    // deviceCenterPosition();
+    _position = Offset(Global.screenWidth / 3.5, Global.screenHeight / 6);
     playSound();
     animationController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 100));
     animation = Tween(begin: -0.01, end: 0.01).animate(
       CurvedAnimation(parent: animationController, curve: Curves.slowMiddle),
     );
-    // Future.delayed(const Duration(seconds: 1), () {
-    //   deviceCenterPosition();
-    // });
-    getOffet();
     super.initState();
   }
-
-  void getOffet() {
-    _position = Offset(Global.screenWidth / 3.5, Global.screenHeight / 6);
-  }
-
-  // void deviceCenterPosition() {
-  //   RenderBox renderBox =
-  //       _widgetKey.currentContext?.findRenderObject() as RenderBox;
-  //   Offset widgetOffset = renderBox.localToGlobal(Offset.zero);
-  //   double centerX = widgetOffset.dx + renderBox.size.width / 2;
-  //   double centerY = widgetOffset.dy + renderBox.size.height / 2;
-
-  //   print('Widget Center X: $centerX');
-  //   print('Widget Center Y: $centerY');
-  //   _position = Offset(centerX, centerY);
-  //   setState(() {});
-  // }
 
   void playSound() async {
     player.play(AssetSource('theme_sound.mp3'));
@@ -138,7 +118,7 @@ class _DiceRollerState extends State<DiceRoller>
       animationController.stop();
     });
     playRollSound();
-    getOffet();
+
     setState(() {
       dice1 = 1;
       dice2 = 1;
@@ -150,7 +130,7 @@ class _DiceRollerState extends State<DiceRoller>
       d5Color = Colors.white;
       d6Color = Colors.white;
       total = 0;
-
+      _position = Offset(Global.screenWidth / 3.5, Global.screenHeight / 6);
       isCalculate = true;
     });
   }
@@ -259,7 +239,7 @@ class _DiceRollerState extends State<DiceRoller>
               ),
               Positioned(
                 bottom: 0.0,
-                left: 1.sw * 0.10,
+                left: 1.sw * 0.068,
                 child: Row(
                   //mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -268,7 +248,7 @@ class _DiceRollerState extends State<DiceRoller>
                     DiceTwo(color: d2Color),
                     SizedBox(width: 3.w),
                     DiceThree(color: d3Color),
-                    SizedBox(width: 7.w),
+                    SizedBox(width: 5.w),
                     InkWell(
                       onTap: resetData,
                       child: Image.asset(
@@ -277,7 +257,7 @@ class _DiceRollerState extends State<DiceRoller>
                         height: 1.sh * 0.12,
                       ),
                     ),
-                    SizedBox(width: 7.w),
+                    SizedBox(width: 5.w),
                     DiceFour(color: d4Color),
                     SizedBox(width: 3.w),
                     DiceFive(color: d5Color),
@@ -288,15 +268,16 @@ class _DiceRollerState extends State<DiceRoller>
               ),
               Positioned(
                 left: 0.0,
-                top: 20.h,
+                top: 0.0,
                 child: SizedBox(
                   width: 20.w,
                   child: ListView.builder(
                     shrinkWrap: true,
                     itemCount: leftList.length,
-                    // scrollDirection: Axis.horizontal,
                     itemBuilder: (context, index) {
                       return Container(
+                        width: 20.w,
+                        height: 20.w,
                         padding: EdgeInsets.all(1.sp),
                         decoration: BoxDecoration(
                           color: total == leftList[index].id
@@ -305,12 +286,23 @@ class _DiceRollerState extends State<DiceRoller>
                           border: Border.all(color: Colors.black, width: 1),
                         ),
                         child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Visibility(
                               visible: leftList[index].id != 18,
-                              child: Text("${leftList[index].id ?? ''}"),
+                              child: Text(
+                                "${leftList[index].id ?? ''}",
+                                style: TextStyle(
+                                  fontSize: 5.sp,
+                                ),
+                              ),
                             ),
-                            Text(leftList[index].name ?? ''),
+                            Text(
+                              leftList[index].name ?? '',
+                              style: TextStyle(
+                                fontSize: 5.sp,
+                              ),
+                            ),
                           ],
                         ),
                       );
@@ -320,15 +312,16 @@ class _DiceRollerState extends State<DiceRoller>
               ),
               Positioned(
                 right: 0.0,
-                top: 20.h,
+                top: 0.0,
                 child: SizedBox(
                   width: 20.w,
                   child: ListView.builder(
                     shrinkWrap: true,
                     itemCount: rightList.length,
-                    // scrollDirection: Axis.horizontal,
                     itemBuilder: (context, index) {
                       return Container(
+                        width: 20.w,
+                        height: 20.w,
                         padding: EdgeInsets.all(1.sp),
                         decoration: BoxDecoration(
                           color: total == rightList[index].id
@@ -340,9 +333,19 @@ class _DiceRollerState extends State<DiceRoller>
                           children: [
                             Visibility(
                               visible: rightList[index].id != 19,
-                              child: Text("${rightList[index].id ?? ''}"),
+                              child: Text(
+                                "${rightList[index].id ?? ''}",
+                                style: TextStyle(
+                                  fontSize: 5.sp,
+                                ),
+                              ),
                             ),
-                            Text(rightList[index].name ?? ''),
+                            Text(
+                              rightList[index].name ?? '',
+                              style: TextStyle(
+                                fontSize: 5.sp,
+                              ),
+                            ),
                           ],
                         ),
                       );

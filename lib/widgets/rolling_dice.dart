@@ -10,7 +10,7 @@ class RollingDice extends StatelessWidget {
     return Image.asset(
       'assets/$diceNumber.webp',
       width: 30.w,
-      height: 70.h,
+      height: 60.h,
     );
   }
 }
