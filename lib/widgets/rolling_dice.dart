@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class RollingDice extends StatelessWidget {
   final int diceNumber;
@@ -8,8 +9,8 @@ class RollingDice extends StatelessWidget {
   Widget build(BuildContext context) {
     return Image.asset(
       'assets/$diceNumber.webp',
-      width: 70.0,
-      height: 70.0,
+      width: 30.w,
+      height: 70.h,
     );
   }
 }
