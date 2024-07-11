@@ -17,6 +17,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     Global.screenHeight = MediaQuery.of(context).size.height;
     Global.screenWidth = MediaQuery.of(context).size.width;
+    Global.x = Global.screenWidth / 3.5;
+    Global.y = Global.screenHeight / 6;
     return ScreenUtilInit(
         designSize: const Size(360, 690),
         minTextAdapt: true,

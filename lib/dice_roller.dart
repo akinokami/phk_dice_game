@@ -36,8 +36,7 @@ class _DiceRollerState extends State<DiceRoller>
   Color? d5Color;
   Color? d6Color;
 
-  late Offset
-      _position; //= Offset(Global.screenWidth / 3.5, Global.screenHeight / 6);
+  Offset _position = Offset(Global.x, Global.y);
 
   bool isCalculate = true;
 
@@ -49,18 +48,27 @@ class _DiceRollerState extends State<DiceRoller>
   late AnimationController animationController;
   late Animation<double> animation;
 
-  final GlobalKey _widgetKey = GlobalKey();
+  //final GlobalKey _widgetKey = GlobalKey();
 
   @override
   void initState() {
-    _position = Offset(Global.screenWidth / 3.5, Global.screenHeight / 6);
     playSound();
     animationController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 100));
     animation = Tween(begin: -0.01, end: 0.01).animate(
       CurvedAnimation(parent: animationController, curve: Curves.slowMiddle),
     );
+    //resetData();
+    resetOffset();
     super.initState();
+  }
+
+  void resetOffset() {
+    Future.delayed(const Duration(seconds: 1), () {
+      setState(() {
+        _position = Offset(Global.x, Global.y);
+      });
+    });
   }
 
   void playSound() async {
@@ -130,7 +138,8 @@ class _DiceRollerState extends State<DiceRoller>
       d5Color = Colors.white;
       d6Color = Colors.white;
       total = 0;
-      _position = Offset(Global.screenWidth / 3.5, Global.screenHeight / 6);
+      // _position = Offset(Global.screenWidth / 3.5, Global.screenHeight / 6);
+      _position = Offset(Global.x, Global.y);
       isCalculate = true;
     });
   }
@@ -152,13 +161,8 @@ class _DiceRollerState extends State<DiceRoller>
               Positioned(
                 top: 1.sh * 0.23,
                 left: 1.sw * 0.16,
-
-                // top: MediaQuery.of(context).size.height c,
-                // left: MediaQuery.of(context).size.width * 0.23,
-                // right: MediaQuery.of(context).size.width * 0.23,
                 child: Center(
                   child: Image.asset(
-                    key: _widgetKey,
                     'assets/plate.webp',
                     width: 1.sw * 0.65,
                     height: 1.sh * 0.4,
@@ -168,20 +172,21 @@ class _DiceRollerState extends State<DiceRoller>
               Positioned(
                 top: 1.sh * 0.20,
                 left: 1.sw * 0.40,
-                // top: MediaQuery.of(context).size.height * 0.2,
-                // left: MediaQuery.of(context).size.width * 0.4,
-                // right: MediaQuery.of(context).size.width * 0.4,
-                child: Column(
-                  children: [
-                    RollingDice(diceNumber: dice1),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        RollingDice(diceNumber: dice2),
-                        RollingDice(diceNumber: dice3),
-                      ],
-                    ),
-                  ],
+                child: SizedBox(
+                  width: 1.sw * 0.17,
+                  height: 1.sh * 0.3,
+                  child: Column(
+                    children: [
+                      RollingDice(diceNumber: dice1),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          RollingDice(diceNumber: dice2),
+                          RollingDice(diceNumber: dice3),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
               Positioned(
