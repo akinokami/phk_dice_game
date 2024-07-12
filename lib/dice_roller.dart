@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:dice_game/global.dart';
 import 'package:dice_game/models/dice_model.dart';
+import 'package:dice_game/widgets/custom_text.dart';
 import 'package:dice_game/widgets/dice_five.dart';
 import 'package:dice_game/widgets/dice_four.dart';
 import 'package:dice_game/widgets/dice_one.dart';
@@ -14,6 +15,7 @@ import 'package:dice_game/widgets/dice_two.dart';
 import 'package:dice_game/widgets/rolling_dice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get_storage/get_storage.dart';
 
 class DiceRoller extends StatefulWidget {
   const DiceRoller({super.key});
@@ -48,7 +50,9 @@ class _DiceRollerState extends State<DiceRoller>
   late AnimationController animationController;
   late Animation<double> animation;
 
-  //final GlobalKey _widgetKey = GlobalKey();
+  bool isAccepted = false;
+  bool isChecked = false;
+  String first = '';
 
   @override
   void initState() {
@@ -58,8 +62,84 @@ class _DiceRollerState extends State<DiceRoller>
     animation = Tween(begin: -0.01, end: 0.01).animate(
       CurvedAnimation(parent: animationController, curve: Curves.slowMiddle),
     );
-    //resetData();
     resetOffset();
+    final box = GetStorage();
+    first = box.read('first') ?? '';
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (first == '') {
+        return showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) => Builder(builder: (context) {
+            return StatefulBuilder(
+              builder: (context, StateSetter setState) {
+                return AlertDialog(
+                  title: CustomText(
+                    text: 'Privacy Policy',
+                    fontWeight: FontWeight.w500,
+                  ),
+                  content: Container(
+                    height: MediaQuery.of(context).size.height * 0.70,
+                    child: SingleChildScrollView(
+                        child: Column(
+                      children: [
+                        Text(Global.policy, style: TextStyle(fontSize: 12)),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Checkbox(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(6)),
+                              activeColor: Colors.green,
+                              side: WidgetStateBorderSide.resolveWith(
+                                (states) => BorderSide(
+                                  width: 1.5,
+                                  color:
+                                      isChecked ? Colors.green : Colors.black,
+                                ),
+                              ),
+                              value: isChecked,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  isChecked = value!;
+                                  if (isChecked) {
+                                    isAccepted = true;
+                                  } else {
+                                    isAccepted = false;
+                                  }
+                                });
+                              },
+                            ),
+                            CustomText(
+                              text: 'I agreed to the Privacy Policy.',
+                              size: 12,
+                            )
+                          ],
+                        ),
+                        ElevatedButton(
+                          child: CustomText(
+                            text: 'Accept',
+                            size: 14,
+                            textColor: Colors.white,
+                          ),
+                          onPressed: isAccepted
+                              ? () {
+                                  final box = GetStorage();
+                                  box.write('first', 'notfirst');
+                                  Navigator.pop(context);
+                                }
+                              : null,
+                        ),
+                      ],
+                    )),
+                  ),
+                );
+              },
+            );
+          }),
+        );
+      }
+    });
     super.initState();
   }
 
@@ -335,6 +415,7 @@ class _DiceRollerState extends State<DiceRoller>
                           border: Border.all(color: Colors.black, width: 1),
                         ),
                         child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Visibility(
                               visible: rightList[index].id != 19,
